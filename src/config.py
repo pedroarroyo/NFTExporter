@@ -33,7 +33,7 @@ modelFileFormat = 'glb'  # The file format of the objects you would like to expo
 # The path to Blend_My_NFTs folder:
 save_path_mac = ''
 save_path_linux = ''
-save_path_windows = r'C:\Users\pedro\Desktop\Blend_My_NFTs'
+save_path_windows = r'.'
 # Place the path in the '', e.g: save_path_mac = '/Users/Path/to/Blend_My_NFTs'
 # Example mac: /Users/Path/to/Blend_My_NFTs
 # Example linux: /Users/Path/to/Blend_My_NFTs
