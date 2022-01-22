@@ -8,8 +8,9 @@ import sys
 import time
 import json
 import importlib
-
+# parroyo BEGIN 01.17.22 Needed to run the lightbake 
 import addon_utils
+# parroyo END
 
 dir = os.path.dirname(bpy.data.filepath)
 sys.path.append(dir)
@@ -62,6 +63,7 @@ def render_and_save_NFTs():
     NFTs_in_Batch, hierarchy, BatchDNAList = getBatchData()
 
     time_start_1 = time.time()
+    print ("PEDRO rendering hierarchy " + str(hierarchy))
 
     x = 1
     for a in BatchDNAList:
@@ -87,6 +89,7 @@ def render_and_save_NFTs():
             for i, j in zip(listAttributes, listDnaDecunstructed):
                 dnaDictionary[i] = j
 
+            print ("PEDRO Found dictionary " + str(dnaDictionary))
             for x in dnaDictionary:
                 for k in hierarchy[x]:
                     kNum = hierarchy[x][k]["number"]
@@ -94,7 +97,9 @@ def render_and_save_NFTs():
                         dnaDictionary.update({x: k})
             return dnaDictionary
 
+        print ("PEDRO Matching DNA to variant " + str(a))
         dnaDictionary = match_DNA_to_Variant(a)
+        print ("PEDRO Found variant " + str(dnaDictionary))
         name = config.nftName + "_" + str(x)
 
         print("")
@@ -124,6 +129,17 @@ def render_and_save_NFTs():
         modelFolder = os.path.join(batchFolder, "Models")
         metaDataFolder = os.path.join(batchFolder, "BMNFT_metaData")
 
+        # parroyo BEGIN 01.17.22 Ensures lightmaps are cleaned while all objects are enabled.
+        if config.enableLightBake:
+            try:
+                bpy.ops.tlm.clean_lightmaps('INVOKE_DEFAULT')
+
+                # Adds time to allow lightmapper to update materials.
+                time.sleep(1)
+            except AttributeError:
+                print("LIGHTMAPPER ADDON NOT INSTALLED!")
+        # parroyo END.
+
         if config.enableGeneration:
             for c in dnaDictionary:
                 collection = dnaDictionary[c]
@@ -134,6 +150,7 @@ def render_and_save_NFTs():
                     bpy.data.collections[collection].hide_viewport = False
                     if config.generationType == 'color':
                         for activeObject in bpy.data.collections[collection].all_objects: 
+                            # parroyo BEGIN 01.17.22 Changes the behavior to update the existing material node.
                             # Updates any emissive materials.
                             print (activeObject.data.materials)
                             for material in activeObject.data.materials:
@@ -148,11 +165,14 @@ def render_and_save_NFTs():
                                 #mat = bpy.data.materials.new("PKHG")
                                 #mat.diffuse_color = config.colorList[collection][colorVal]
                                 #activeObject.active_material = mat
+                            # parroyo END    
                     if config.generationType == 'material':
                         for activeObject in bpy.data.collections[collection].all_objects: 
                             activeObject.material_slots[0].material = bpy.data.materials[config.colorList[collection][colorVal]]
                 else:
+                    print ("Handling non colored collection: " + collection)
                     collection = stripColorFromName(collection)
+                    print ("Name after stripping color index: " + collection)
                     bpy.data.collections[collection].hide_render = False
                     bpy.data.collections[collection].hide_viewport = False
 
@@ -166,7 +186,7 @@ def render_and_save_NFTs():
                 time.sleep(1)
             except AttributeError:
                 print("LIGHTMAPPER ADDON NOT INSTALLED!")
-        
+
         if config.enableImages:
             if not os.path.exists(imageFolder):
                 os.makedirs(imageFolder)
@@ -189,12 +209,9 @@ def render_and_save_NFTs():
 
             for i in dnaDictionary:
                 coll = dnaDictionary[i]
-                #parroyo BEGIN
-                '''
-                Remove Color code so blender recognises the collection
-                '''
+                # parroyo BEGIN 01.17.22 Strip color index from the collection name before lookup.
                 coll = stripColorFromName(coll)
-                #parroyo END
+                # parroyo END 
                 for obj in bpy.data.collections[coll].all_objects:
                     obj.select_set(True)
 

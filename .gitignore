@@ -1,11 +1,13 @@
 # These files are intentionally ignored - this file only applies to the git repo
-*.blend1
 *.blend
+*.blend1
 *.json
 
 Complete_Collection
 .idea
 __pycache__
-.Ds_Store
-
 Lightmaps/
+NFTRecord.json
+RarityData.json
+3D_Model_Test.blend
+.Ds_Store

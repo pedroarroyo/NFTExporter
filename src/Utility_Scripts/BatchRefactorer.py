@@ -21,13 +21,17 @@ from src.Main_Generators import metaData
 importlib.reload(config)
 importlib.reload(metaData)
 
+removeList = [".gitignore", ".DS_Store"]
+
 def getNFType():
     images = False
     animations = False
     models = False
     metaData = False
 
-    batchContent = os.listdir(os.path.join(config.nft_save_path, (os.listdir(config.nft_save_path)[0])))
+    batch1 = [x for x in os.listdir(config.nft_save_path) if (x not in removeList)][0]  # Gets first Batch and ignores removeList files
+    batchContent = os.listdir(os.path.join(config.nft_save_path, batch1))
+    batchContent = [x for x in batchContent if (x not in removeList)]
 
     if "Images" in batchContent:
         images = True
@@ -39,7 +43,6 @@ def getNFType():
         metaData = True
 
     return images, animations, models, metaData
-
 
 def getMetaDataDirty(completeMetaDataPath, i):
     '''
@@ -130,7 +133,6 @@ def reformatNFTCollection():
         os.mkdir(completeMetaDataPath)
 
     batchListDirty = os.listdir(config.nft_save_path)
-    removeList = [".gitignore", ".DS_Store"]
     batchList = [x for x in batchListDirty if (x not in removeList)]
 
     imageCount = 1

@@ -150,7 +150,7 @@ def returnData():
             '''
             Returns the name of "i" attribute variant
             '''
-            name = re.sub(r'[^a-zA-Z]', "", i)
+            name = i.split("_")[0]
             return name
 
          def getOrder_rarity(i):
@@ -164,7 +164,8 @@ def returnData():
 
          name = getName(i)
          orderRarity = getOrder_rarity(i)
-
+         print ("PEDRO Processing attribute variant: " + name + " with order rarity: " + str(orderRarity))
+         print ("PEDRO Attribute data: " + str(i))
          if len(orderRarity) == 0:
             print(bcolors.ERROR + "\nERROR:" + bcolors.RESET)
             print("The collection " + str(i) + " doesn't follow the naming conventions of attributes. Please move this \n"
@@ -173,21 +174,27 @@ def returnData():
 
          elif len(orderRarity) > 0:
             number = orderRarity[0]
-            if config.enableGeneration:
-               if count == 1 or count == 0:
-                  previousAttribute = i.partition("_")[0]
-                  count +=1
-               elif i.partition("_")[0] == previousAttribute:
-                  count +=1
-               else:
-                  count = 1
-               number = str(count)
+            # parroyo BEGIN HACK Figure out how to enumerate variation and color combos here. For now just set the number to the color
+            # What is this logic trying to do?
+            #if config.enableGeneration:
+            #   if count == 1 or count == 0:
+            #      previousAttribute = i.partition("_")[0]
+            #      count +=1
+            #   elif i.partition("_")[0] == previousAttribute:
+            #      count +=1
+            #   else:
+            #      count = 1
+            #   number = str(count)
+            # parroyo END
             rarity = orderRarity[1]
             if config.enableGeneration and stripColorFromName(i) in config.colorList:
+               count += 1
+               number = str(count)
                color = orderRarity[2]
             else:
                color = "0"
             eachObject = {"name": name, "number": number, "rarity": rarity, "color": color}
+            print ("PEDRO Writing variant: " + str(eachObject))
             allAttDataList[i] = eachObject
       return allAttDataList
 
@@ -229,7 +236,9 @@ def returnData():
       '''
       Returns "combinations" the number of all possible NFT combinations.
       '''
+
       hierarchyByNum = []
+
       for i in hierarchy:
          # Ignore Collections with nothing in them
          if len(hierarchy[i]) != 0:
@@ -237,9 +246,17 @@ def returnData():
          else:
             print("The following collection has been identified as empty:")
             print(i)
+
       combinations = 1
+
       for i in hierarchyByNum:
          combinations = combinations*i
+
+      try:
+         numBatches = combinations/config.nftsPerBatch
+
+      except:
+         print(bcolors.ERROR + "ERROR:\nnftsPerBatch in config.py needs to be a positive integer." + bcolors.RESET)
 
       if combinations == 0:
          print(bcolors.ERROR + "\nERROR:" + bcolors.RESET)
@@ -250,8 +267,6 @@ def returnData():
          print("Here is the hierarchy of all collections the DNA_Generator gathered from your .blend file, excluding "
                "\nthose in Script_Ignore:")
          print(hierarchy)
-
-      numBatches = combinations/config.nftsPerBatch
 
       if numBatches < 1:
          print(bcolors.ERROR + "ERROR:" + bcolors.RESET)
@@ -285,11 +300,8 @@ def generateNFT_DNA():
 
    listAllCollections, attributeCollections, attributeCollections1, hierarchy, possibleCombinations = returnData()
 
-   print("-----------------------------------------------------------------------------")
-   print("The number of possible DNA combinations is " + str(possibleCombinations))
-   print("")
-   print("Generating " + str(config.maxNFTs) + " combinations of DNA. Set in config.py.")
-   print("")
+   print(f"NFT Combinations: {possibleCombinations}\n")
+   print(f"Generating {config.maxNFTs} combinations of DNA.\n")
 
    DataDictionary = {}
    listOptionVariant = []
@@ -298,7 +310,6 @@ def generateNFT_DNA():
    if not config.enableRarity:
       DNASet = set()
 
-      print (hierarchy)
       for i in hierarchy:
          numChild = len(hierarchy[i])
          possibleNums = list(range(1, numChild + 1))
@@ -323,7 +334,7 @@ def generateNFT_DNA():
 
       for i in range(config.maxNFTs):
          dnaPushToList = partial(createDNARandom)
-         print("Generating DNA set for " + str(config.maxNFTs) + " max NFTs with a DNA set of length " + str(len(DNASet)))
+
          DNASet |= {''.join([dnaPushToList()]) for _ in range(config.maxNFTs - len(DNASet))}
 
       DNAList = list(DNASet)
@@ -351,7 +362,7 @@ def generateNFT_DNA():
    DataDictionary["hierarchy"] = hierarchy
    DataDictionary["DNAList"] = DNAList
 
-   return DataDictionary, possibleCombinations
+   return DataDictionary, possibleCombinations, DNAList
 
 def send_To_Record_JSON():
    '''
@@ -361,31 +372,18 @@ def send_To_Record_JSON():
    repeate DNA.
    '''
 
-   DataDictionary, possibleCombinations = generateNFT_DNA()
+   DataDictionary, possibleCombinations, DNAList = generateNFT_DNA()
 
-   ledger = json.dumps(DataDictionary, indent=1, ensure_ascii=True)
-   with open(os.path.join(config.save_path, "NFTRecord.json"), 'w') as outfile:
-      outfile.write(ledger + '\n')
+   try:
+      ledger = json.dumps(DataDictionary, indent=1, ensure_ascii=True)
+      with open(os.path.join(config.save_path, "NFTRecord.json"), 'w') as outfile:
+         outfile.write(ledger + '\n')
+      print(bcolors.OK + f"{len(DNAList)} NFT DNA sent to NFTRecord.json in %.4f seconds.\n" % (time.time() - time_start) + bcolors.RESET)
 
-   print("")
-   print("All possible combinations of DNA sent to NFTRecord.json with " + str(possibleCombinations) + " NFT DNA sequences generated in %.4f seconds" % (time.time() - time_start))
-   print("")
-   print("If you want the number of NFT DNA sequences to be higher, please add more variants or attributes to your .blend file")
-   print("")
-
-# Utility functions:
-
-# ONLY FOR TESTING, DO NOT EVER USE IF NFTRecord.json IS FULL OF REAL DATA
-# THIS WILL DELETE THE RECORD:
-# Note - NFTRecrod.json will be created the next time you run main.py
-def clearNFTRecord(AREYOUSURE):
-   if AREYOUSURE == True:
-      os.remove("NFTRecord.json")
-
-# clearNFTRecord()
+   except:
+      print(bcolors.ERROR + "ERROR:\nNFT DNA not sent to NFTRecord.json.\n" + bcolors.RESET)
 
 if __name__ == '__main__':
    stripColorFromName()
    returnData()
    send_To_Record_JSON()
-   clearNFTRecord()

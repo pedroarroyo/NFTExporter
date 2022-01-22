@@ -39,8 +39,8 @@ save_path_windows = r'.'
 # Example linux: /Users/Path/to/Blend_My_NFTs
 # Example windows: C:\Users\Path\to\Blend_My_NFTs
 
-maxNFTs = 9  # The maximum number of NFTs you want to generate.
-nftsPerBatch = 9  # Number of NFTs per batch
+maxNFTs = 1  # The maximum number of NFTs you want to generate.
+nftsPerBatch = 1  # Number of NFTs per batch
 renderBatch = 1  # The batch number to render in Exporter.py
 
 # Set to True to generate images or 3D models depending on your settings below when main.py is run in Blender. Only works
@@ -53,7 +53,7 @@ enableModelsBlender = True  # Generates 3D models when main.py is run in Blender
 # ^^ Generates models with .blend file NOT external object library.
 
 # Set to true to perform a lightbake before export. Only necessary when generating final output.
-enableLightBake = True
+enableLightBake = False
 
 # Enables Rarity_Sorter to weigh NFT DNA attributes and variants:
 enableRarity = False
@@ -72,7 +72,7 @@ refactorBatchOrder = False  # When set to True, sorts, renames, and moves all NF
 # Set the following to True to generate the format of the Meta Data template for your NFTs blockchain. (You can use multiple)
 cardanoMetaData = False  # Cardano - Format Source: https://cips.cardano.org/cips/cip25/
 solanaMetaData = False  # Solana - Format Source: https://docs.metaplex.com/nft-standard
-erc721MetaData = False  # Ethereum ERC721 - Format Source: https://eips.ethereum.org/EIPS/eip-721
+erc721MetaData = False  # Ethereum ERC721 - Format Source: https://docs.opensea.io/docs/metadata-standards
 
 turnNumsOff = True  # When set to True, turns off the extension numbers representing order and rarity from the names of
 # variants in meta Data.
@@ -97,23 +97,13 @@ generationType = 'color'  # You can either set 'color' or 'material' here. Type 
 # The collections below are RGBA Color values. You can put as many or as little color values in these lists as you would like.
 # You can create any number of rgbaColorLists and assign them to any number of collections that you would like.
 # Each set of rgbaColorList1 assigned to an object by collection name in the colorList will act like an attribute and create a unique variant of that item.
-primaryKeyLightColors = [(1, .631, .934, 1), (0, 1, 0, 1), (0, 0, 1, 1)]
-primaryFillLightColors = [(.601, .239, .420, 1), (0, 1, 0, 1), (0, 0, 1, 1)]
-topLeftTrimColors = [(.8, .126, .034, 1), (0, 1, 0, 1), (0, 0, 1, 1)]
-middleLeftTrimColors = [(.8, .126, .034, 1), (0, 1, 0, 1), (0, 0, 1, 1)]
-bottomTrimColors = [(.8, .126, .034, 1), (0, 1, 0, 1), (0, 0, 1, 1)]
-
+primaryColorList = [(.456, .781, .826, 1), (.528, .445, .823, 1)]
+neonsColorList = [(1, 0, 0, 1), (0, 1, 0, 1), (0, 0, 1, 1), (1, 1, 1, 1)]
 # The following color list can be as long or as short as you want it to be.
 # To use this all you need to do is place the name of the collection you want colored in the "" and the set of colors you want to apply to it after the :
 # The collection named can only contain objects and not sub collections. Every object in the collection will be set to the colors you assigned above for each attribute
 if generationType == 'color':  # Do not change this line.
-    colorList = {        
-        "PrimaryKeyLight_1_0" : primaryKeyLightColors,
-        "PrimaryFillLight_1_0" : primaryFillLightColors,
-        "TrimTopLeft_1_0" : topLeftTrimColors,
-        "TrimMiddleLeft_1_0" : middleLeftTrimColors,
-        "TrimBottom_1_0" : bottomTrimColors
-        }
+    colorList = {"PrimaryColor_1_0": primaryColorList}
 
 ### These materials must be in your Current Files' Materials. Make sure that you've set your materials as "fake user". ###
 # The collections below are Current Files' Materials. You can put as many or as little materials values in these lists as you would like.
