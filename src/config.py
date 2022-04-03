@@ -33,14 +33,14 @@ modelFileFormat = 'glb'  # The file format of the objects you would like to expo
 # The path to Blend_My_NFTs folder:
 save_path_mac = ''
 save_path_linux = ''
-save_path_windows = r'.'
+save_path_windows = r'C:\Users\pedro\Git\NFTExporter'
 # Place the path in the '', e.g: save_path_mac = '/Users/Path/to/Blend_My_NFTs'
 # Example mac: /Users/Path/to/Blend_My_NFTs
 # Example linux: /Users/Path/to/Blend_My_NFTs
 # Example windows: C:\Users\Path\to\Blend_My_NFTs
 
-maxNFTs = 1  # The maximum number of NFTs you want to generate.
-nftsPerBatch = 1  # Number of NFTs per batch
+maxNFTs = 5  # The maximum number of NFTs you want to generate.
+nftsPerBatch = 5  # Number of NFTs per batch
 renderBatch = 1  # The batch number to render in Exporter.py
 
 # Set to True to generate images or 3D models depending on your settings below when main.py is run in Blender. Only works
@@ -97,13 +97,32 @@ generationType = 'color'  # You can either set 'color' or 'material' here. Type 
 # The collections below are RGBA Color values. You can put as many or as little color values in these lists as you would like.
 # You can create any number of rgbaColorLists and assign them to any number of collections that you would like.
 # Each set of rgbaColorList1 assigned to an object by collection name in the colorList will act like an attribute and create a unique variant of that item.
-primaryColorList = [(.456, .781, .826, 1), (.528, .445, .823, 1)]
-neonsColorList = [(1, 0, 0, 1), (0, 1, 0, 1), (0, 0, 1, 1), (1, 1, 1, 1)]
+
+# PEDRO_BEGIN Adding colorway support
+#pinkColorway = [(.456, .781, .826, 1)]
+#blueColorway = [(.528, .445, .823, 1)]
+pinkColorway = {
+    "Colorway_1_0_Primary": (1.0, .820, .863, 1),
+    "Colorway_1_0_Accent": (.682, .775, .812, 1)
+}
+
+blueColorway = {
+    "Colorway_2_0_Primary": (.456, .781, .826, 1),
+    "Colorway_2_0_Accent": (.800, .730, .393, 1)
+}
+
+# PEDRO_END
+
 # The following color list can be as long or as short as you want it to be.
 # To use this all you need to do is place the name of the collection you want colored in the "" and the set of colors you want to apply to it after the :
 # The collection named can only contain objects and not sub collections. Every object in the collection will be set to the colors you assigned above for each attribute
+
 if generationType == 'color':  # Do not change this line.
-    colorList = {"PrimaryColor_1_0": primaryColorList}
+# PEDRO_BEGIN Adding colorway support
+#    colorList = {"Colorway_1_0": primaryColorList}
+    colorList = {"Colorway_1_0": pinkColorway, "Colorway_2_0": blueColorway}
+
+#PEDRO_END
 
 ### These materials must be in your Current Files' Materials. Make sure that you've set your materials as "fake user". ###
 # The collections below are Current Files' Materials. You can put as many or as little materials values in these lists as you would like.

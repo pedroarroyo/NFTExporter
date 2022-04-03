@@ -143,25 +143,44 @@ def render_and_save_NFTs():
         if config.enableGeneration:
             for c in dnaDictionary:
                 collection = dnaDictionary[c]
+                print ("here")
+                print (collection)
                 if stripColorFromName(collection) in config.colorList:
                     colorVal = int(collection.rsplit("_", 1)[1])-1
                     collection = stripColorFromName(collection)
                     bpy.data.collections[collection].hide_render = False
                     bpy.data.collections[collection].hide_viewport = False
                     if config.generationType == 'color':
+                        colorDict = config.colorList[collection]
+                        print (colorDict)
+                        print (colorDict.keys())
                         for activeObject in bpy.data.collections[collection].all_objects: 
                             # parroyo BEGIN 01.17.22 Changes the behavior to update the existing material node.
-                            # Updates any emissive materials.
-                            print (activeObject.data.materials)
-                            for material in activeObject.data.materials:
-                                print (activeObject)
-                                print (material)
-                                print (config.colorList[collection][colorVal])
-                                nodes = material.node_tree.nodes
-                                for node in nodes:
-                                    if node.type == "RGB":
-                                        node.outputs["Color"].default_value = config.colorList[collection][colorVal]
-
+                            #print (activeObject.data.materials)
+                            #for material in activeObject.data.materials:
+                            #    print (activeObject)
+                            #    print (material)
+                            #    print (config.colorList[collection][colorVal])
+                            #    nodes = material.node_tree.nodes
+                            #    for node in nodes:
+                            #        if node.type == "RGB":
+                            #            node.outputs["Color"].default_value = config.colorList[collection][colorVal]
+                            print ("activeObject: " + activeObject.name)
+                            if activeObject.name in colorDict:
+                                print ("ACTIVE OBJECT IN COLORDICT")
+                                #color = config.colorList[collection][colorVal]        
+                                color = colorDict[activeObject.name]
+                                print (activeObject.data.materials)
+                                for material in activeObject.data.materials:
+                                    print (material)
+                                    print (color)
+                                    nodes = material.node_tree.nodes
+                                    for node in nodes:
+                                        if node.type == "RGB":
+                                            node.outputs["Color"].default_value = color
+                            else:
+                                print ("ACTIVE OBJECT NOT IN COLORDICT")
+                                
                                 #mat = bpy.data.materials.new("PKHG")
                                 #mat.diffuse_color = config.colorList[collection][colorVal]
                                 #activeObject.active_material = mat

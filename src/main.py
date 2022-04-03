@@ -8,6 +8,9 @@ import importlib
 
 dir = os.path.dirname(bpy.data.filepath)
 sys.path.append(dir)
+# PEDRO BEGIN Adds absolute path to scripts
+sys.path.append(r'C:\Users\pedro\Git\NFTExporter')
+# PEDRO END
 sys.modules.values()
 
 class bcolors:
